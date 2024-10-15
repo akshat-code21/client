@@ -39,21 +39,46 @@ const formSchema = z.object({
 });
 
 export function CreateNewProjectForm() {
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       projectTitle: "",
       difficulty: "",
+      projectDescription: "",
     },
   });
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const projectType = "NEW"; 
+  
+      const token = localStorage.getItem('token'); 
+  
+      const response = await fetch('http://localhost:3000/projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, 
+        },
+        body: JSON.stringify({
+          name: values.projectTitle,
+          description: values.projectDescription,
+          type: projectType, 
+        }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Project created:', data);
+      } else {
+        const errorData = await response.json(); 
+        console.error('Failed to create project:', errorData);
+      }
+    } catch (error) {
+      console.error('Error creating project:', error);
+    }
   }
+  
 
   return (
     <div className="border-2 h-full w-full rounded-lg flex flex-col px-4 py-4">
@@ -129,3 +154,4 @@ export function CreateNewProjectForm() {
     </div>
   );
 }
+

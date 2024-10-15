@@ -34,7 +34,7 @@ const LoginPage = () => {
   async function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     setLoading(true);
-
+  
     if (!otpGenerated) {
       const email = contactRef.current?.value || "";
       if (!email || !email.includes("@")) {
@@ -43,7 +43,7 @@ const LoginPage = () => {
         setLoading(false);
         return;
       }
-
+  
       // Sending POST request to backend to generate OTP
       try {
         const response = await fetch("http://localhost:3000/auth/sendOTP", {
@@ -53,11 +53,11 @@ const LoginPage = () => {
           },
           body: JSON.stringify({ email }),
         });
-
+  
         if (!response.ok) {
           throw new Error("Something went wrong!");
         }
-
+  
         const data = await response.json();
         setOtpPin(data.otp_pin);
         setButtonText("Verify OTP");
@@ -70,25 +70,47 @@ const LoginPage = () => {
         setLoading(false);
       }
     } else {
+      const email = contactRef.current?.value || "";
       const otp = otpRef.current?.value || "";
-      if (otp !== otpPin) {
-        console.log("Invalid OTP");
-        setError(InvalidOtpError);
+  
+      // Sending POST request to backend to verify OTP
+      try {
+        const response = await fetch("http://localhost:3000/auth/signin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, otp }), 
+        });
+  
+        if (!response.ok) {
+          throw new Error("Invalid OTP. Please try again."); 
+        }
+  
+        const loginData = await response.json();
+        login({
+          email: loginData.email,
+          name: loginData.name,
+          token: loginData.token,
+          type: "user",
+        });
+  
+        
+        localStorage.setItem('token', loginData.token);
+  
+        setError("");
+        navigate("/dashboard");
+        console.log("Login Successful!");
+      } catch (err) {
+        setError("Invalid OTP. Please try again.");
+        console.error(err);
+      } finally {
         setLoading(false);
-        return;
       }
-      login({
-        email: "borncancer21@gmail.com",
-        name: "Akshat Sipany",
-        token: "test",
-        type: "user",
-      });
-      setError("");
-      navigate("/dashboard");
-      console.log("Login Successful!");
-      setLoading(false);
     }
   }
+  
+  
 
   return (
     <>
