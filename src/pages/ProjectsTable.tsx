@@ -3,34 +3,41 @@ import { DataTable } from "../components/Table/data-table";
 
 import { useEffect, useState } from "react";
 
-async function getData(): Promise<Project[]> {
-  // Fetch data from your API here.
-  return [
-    {
-      id: "728ed52f",
-      projects: "Project 1",
-      slugs: "project-1",
-      status: "pending",
-      title: "We need to bypass the neutral TCP sensor!",
-    },
-    {
-      id: "728ed52g",
-      projects: "Project 2",
-      slugs: "project-2",
-      status: "processing",
-      title:
-        "Use the open-source THX transmitter, then you can hack the auxiliary sensor!",
-    },
-    {
-      id: "728ed52h",
-      projects: "Project 3",
-      slugs: "project-3",
-      status: "success",
-      title:
-        "Try to quantify the HTTP transmitter, maybe it will bypass the digital firewall!",
-    },
-  ];
+async function getData(): Promise<Project[]> { 
+  try {
+    const token = localStorage.getItem('token'); 
+
+    const response = await fetch('http://localhost:3000/projects', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, 
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch projects'); 
+    }
+
+    const data = await response.json();
+    console.log(data.data); 
+
+    
+    const projects: Project[] = data.data.map((item: any) => ({
+      id: item.id, 
+      projects: `Project ${item.id}`, 
+      slugs: item.slug || "", 
+      status: "pending", 
+      title: item.name || "", 
+    }));
+
+    return projects; 
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+    return []; 
+  }
 }
+
 
 export default function DemoPage() {
   const [data, setData] = useState<Project[]>([]);

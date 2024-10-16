@@ -3,8 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-// import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import {
   Select,
   SelectContent,
@@ -12,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import {
   Form,
   FormControl,
@@ -24,7 +22,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "../ui/button";
-// import { Link } from "lucide-react";
 
 const formSchema = z.object({
   projectTitle: z.string().min(5, {
@@ -39,6 +36,7 @@ const formSchema = z.object({
 });
 
 export function CreateNewProjectForm() {
+  const navigate = useNavigate(); // Initialize useNavigate
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -70,6 +68,9 @@ export function CreateNewProjectForm() {
       if (response.ok) {
         const data = await response.json();
         console.log('Project created:', data);
+        
+        // Redirect to the projects page after successful submission
+        navigate('/dashboard/projects'); // Use navigate to go to the projects page
       } else {
         const errorData = await response.json(); 
         console.error('Failed to create project:', errorData);
@@ -92,7 +93,7 @@ export function CreateNewProjectForm() {
                 <FormItem className="w-full max-w-[50%]">
                   <FormLabel>Project Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Project Titlte .." {...field} />
+                    <Input placeholder="Project Title .." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -145,13 +146,10 @@ export function CreateNewProjectForm() {
           </div>
           <div className="flex gap-4 justify-end px-4 py-4">
             <Button className="bg-red-500">Cancel</Button>
-            {/* <Link to="/dashboard"> */}
-            <Button className="bg-bhasiniBlue">Submit</Button>
-            {/* </Link> */}
+            <Button type="submit" className="bg-bhasiniBlue">Submit</Button>
           </div>
         </form>
       </Form>
     </div>
   );
 }
-

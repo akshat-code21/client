@@ -10,11 +10,11 @@ const SideBarLink = [
     icon: Eye,
     path: "overview",
   },
-  {
-    title: "Projects",
-    icon: Building,
-    path: "projects",
-  },
+  // {
+  //   title: "Projects",
+  //   icon: Building,
+  //   path: "projects",
+  // },
   {
     title: "Proposals",
     icon: PaperclipIcon,
@@ -57,7 +57,7 @@ const SideBar = () => {
               className: "px-6",
             })}
           >
-            Submit a new Project Idea
+            Submit a new Proposal
           </Link>
         </div>
       </div>
