@@ -10,11 +10,11 @@ const SideBarLink = [
     icon: Eye,
     path: "overview",
   },
-  // {
-  //   title: "Projects",
-  //   icon: Building,
-  //   path: "projects",
-  // },
+  {
+    title: "Projects",
+    icon: Building,
+    path: "projects",
+  },
   {
     title: "Proposals",
     icon: PaperclipIcon,

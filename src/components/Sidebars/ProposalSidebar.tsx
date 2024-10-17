@@ -67,7 +67,7 @@ const ProposalSidebar = ({ id }: { id: string }) => {
               className: "px-6",
             })}
           >
-            Submit a new Project Idea
+            Submit a new Proposal
           </Link>
         </div>
       </div>

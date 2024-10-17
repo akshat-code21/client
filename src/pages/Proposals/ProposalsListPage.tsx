@@ -1,7 +1,6 @@
 // import DemoPage from "./ProjectsTable";
-import PageHeading from "@/components/Common/PageHeading";
-import DemoPage from "../ProjectsTable"; // Import the correct component
-
+import PageHeading from "@/components/Common/PageHeading"; // Import the correct component
+import ProposalDemoPage from "../Proposals/ProposalDemoPage";
 const ProposalsListPage = () => {
   // ...
 
@@ -11,7 +10,7 @@ const ProposalsListPage = () => {
         title="Proposals"
         description="All the proposals you have submitted!"
       />
-      <DemoPage />
+      <ProposalDemoPage></ProposalDemoPage>
     </>
   );
 };
