@@ -10,7 +10,7 @@ import {
 import mail from "@/assets/mail.svg";
 import otp from "@/assets/otp.svg";
 import { useNavigate } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { InputIcon } from "@/components/ui/input-icon";
 import { useBhasiniStore } from "@/store/store";
 
@@ -19,22 +19,36 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [buttonText, setButtonText] = useState("Get OTP");
   const [otpGenerated, setOtpGenerated] = useState(false);
-  const [otpPin, setOtpPin] = useState(""); // Store OTP from backend here
+  const [otpPin, setOtpPin] = useState(""); 
+  const [otpExpiryTime, setOtpExpiryTime] = useState<number | null>(null); 
+  const [canResend, setCanResend] = useState(false);
 
   const InvalidEmailError = "Invalid Email ID";
-
   const navigate = useNavigate();
-  const InvalidOtpError = "Invalid OTP";
+  const InvalidOtpError = "Invalid OTP. Please Try Again";
 
   const { login } = useBhasiniStore();
 
   const contactRef = useRef<HTMLInputElement>(null);
   const otpRef = useRef<HTMLInputElement>(null);
 
+  const otpExpiryDuration = 5 * 60; 
+  useEffect(() => {
+    if (otpExpiryTime && otpExpiryTime > 0) {
+      const timer = setInterval(() => {
+        setOtpExpiryTime((prev) => (prev ? prev - 1 : 0));
+      }, 1000);
+
+      return () => clearInterval(timer);
+    } else if (otpExpiryTime === 0) {
+      setCanResend(true);
+    }
+  }, [otpExpiryTime]);
+
   async function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     setLoading(true);
-  
+
     if (!otpGenerated) {
       const email = contactRef.current?.value || "";
       if (!email || !email.includes("@")) {
@@ -43,8 +57,6 @@ const LoginPage = () => {
         setLoading(false);
         return;
       }
-  
-      // Sending POST request to backend to generate OTP
       try {
         const response = await fetch("http://localhost:3000/auth/sendOTP", {
           method: "POST",
@@ -53,16 +65,18 @@ const LoginPage = () => {
           },
           body: JSON.stringify({ email }),
         });
-  
+
         if (!response.ok) {
           throw new Error("Something went wrong!");
         }
-  
+
         const data = await response.json();
         setOtpPin(data.otp_pin);
         setButtonText("Verify OTP");
         setOtpGenerated(true);
+        setOtpExpiryTime(otpExpiryDuration); 
         setError("");
+        setCanResend(false); 
       } catch (err) {
         setError("Failed to generate OTP.");
         console.error(err);
@@ -72,21 +86,20 @@ const LoginPage = () => {
     } else {
       const email = contactRef.current?.value || "";
       const otp = otpRef.current?.value || "";
-  
-      // Sending POST request to backend to verify OTP
+
       try {
         const response = await fetch("http://localhost:3000/auth/signin", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email, otp }), 
+          body: JSON.stringify({ email, otp }),
         });
-  
+
         if (!response.ok) {
-          throw new Error("Invalid OTP. Please try again."); 
+          throw new Error(InvalidOtpError);
         }
-  
+
         const loginData = await response.json();
         login({
           email: loginData.email,
@@ -94,23 +107,50 @@ const LoginPage = () => {
           token: loginData.token,
           type: "user",
         });
-  
-        
-        localStorage.setItem('token', loginData.token);
-  
+
+        localStorage.setItem("token", loginData.token);
+
         setError("");
         navigate("/dashboard");
         console.log("Login Successful!");
       } catch (err) {
-        setError("Invalid OTP. Please try again.");
+        setError(InvalidOtpError);
         console.error(err);
       } finally {
         setLoading(false);
       }
     }
   }
-  
-  
+
+  async function handleResendOtp() {
+    const email = contactRef.current?.value || "";
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("http://localhost:3000/auth/resendOTP", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to resend OTP");
+      }
+
+      const data = await response.json();
+      setOtpPin(data.otp_pin);
+      setOtpExpiryTime(otpExpiryDuration); 
+      setCanResend(false); 
+    } catch (err) {
+      setError("Failed to resend OTP.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <>
@@ -137,18 +177,27 @@ const LoginPage = () => {
             />
           </div>
           {otpGenerated && (
-            <div className="grid gap-2">
-              <InputIcon
-                icon={otp}
-                ref={otpRef}
-                className="appearance-none"
-                id="otp"
-                type="text"
-                maxLength={6}
-                placeholder="Enter OTP"
-                required
-              />
-            </div>
+            <>
+              <div className="grid gap-2">
+                <InputIcon
+                  icon={otp}
+                  ref={otpRef}
+                  className="appearance-none"
+                  id="otp"
+                  type="text"
+                  maxLength={6}
+                  placeholder="Enter OTP"
+                  required
+                />
+              </div>
+              <div className="text-center text-gray-600">
+                {otpExpiryTime ? (
+                  <span>OTP expires in {otpExpiryTime}s</span>
+                ) : (
+                  <span className="text-red-500">OTP expired!</span>
+                )}
+              </div>
+            </>
           )}
         </CardContent>
         <Button
@@ -158,6 +207,17 @@ const LoginPage = () => {
         >
           {buttonText}
         </Button>
+
+        {otpGenerated && canResend && (
+          <Button
+            disabled={loading}
+            onClick={handleResendOtp}
+            className="bg-gray-500 hover:bg-gray-600 w-full mt-2"
+          >
+            Resend OTP
+          </Button>
+        )}
+
         <CardFooter className="flex items-center justify-center m-5">
           <span>
             New Member ?{" "}
