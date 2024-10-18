@@ -45,6 +45,33 @@ const LoginPage = () => {
     }
   }, [otpExpiryTime]);
 
+  const refreshToken = async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    if (!refreshToken) {
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3000/auth/refreshToken", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to refresh token");
+      }
+
+      const data = await response.json();
+      localStorage.setItem("token", data.token); 
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   async function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     setLoading(true);
@@ -109,6 +136,7 @@ const LoginPage = () => {
         });
 
         localStorage.setItem("token", loginData.token);
+        localStorage.setItem("refreshToken", loginData.refreshToken); 
 
         setError("");
         navigate("/dashboard");
@@ -212,23 +240,11 @@ const LoginPage = () => {
           <Button
             disabled={loading}
             onClick={handleResendOtp}
-            className="bg-gray-500 hover:bg-gray-600 w-full mt-2"
+            className="bg-gray-400 hover:bg-gray-500 w-full mt-2"
           >
             Resend OTP
           </Button>
         )}
-
-        <CardFooter className="flex items-center justify-center m-5">
-          <span>
-            New Member ?{" "}
-            <a
-              className="text-bhasiniBlue hover:cursor-pointer  hover:text-bhashiniBlueHover"
-              onClick={() => navigate("/auth/signup")}
-            >
-              <u>Sign Up</u>
-            </a>
-          </span>
-        </CardFooter>
       </Card>
     </>
   );
