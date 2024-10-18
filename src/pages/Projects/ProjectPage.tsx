@@ -88,6 +88,17 @@ function ProjectPage() {
             </div>
           </div>
         </div>
+          <div>
+              <Link
+              to={`/dashboard/projects`}
+              className={buttonVariants({
+                // variant: "default",
+                className: "bg-bhasiniBlue",
+              })}
+              >
+              Go Back
+            </Link>
+          </div>
       </main>
     </>
   );

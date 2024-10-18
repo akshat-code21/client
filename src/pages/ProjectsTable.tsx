@@ -26,7 +26,7 @@ async function getData(): Promise<Project[]> {
     const projects: Project[] = data.data.map((item: any) => ({
       id: item.id, 
       projects: `Project ${item.id}`, 
-      slugs: item.slug || "", 
+      slugs: `${item.id}` || "", 
       status: "pending", 
       title: item.name || "", 
     }));

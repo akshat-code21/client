@@ -294,7 +294,7 @@ function SubmitProfileDetailForm() {
                 <FormItem>
                   <FormLabel>Occupations</FormLabel>
                   <FormControl>
-                    <Input placeholder="Occupations" {...field} />
+                    <Input placeholder="Occupations (Enter NA if none)" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -307,7 +307,7 @@ function SubmitProfileDetailForm() {
                 <FormItem>
                   <FormLabel>Experience</FormLabel>
                   <FormControl>
-                    <Input placeholder="Experience" {...field} />
+                    <Input placeholder="Experience (Enter NA if none)" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
