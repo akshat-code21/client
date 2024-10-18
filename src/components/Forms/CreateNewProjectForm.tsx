@@ -135,7 +135,7 @@ export function CreateNewProjectForm() {
                   <FormControl>
                     <Textarea
                       className="h-80"
-                      placeholder="Project Description .."
+                      placeholder="Project Description ..."
                       {...field}
                     />
                   </FormControl>

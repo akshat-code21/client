@@ -19,7 +19,7 @@ import { Link } from "react-router-dom";
 // You can use a Zod schema here if you want.
 export type Proposal = {
   id: string;
-  projects: string;
+  proposals: string;
   slugs: string;
   status: "pending" | "processing" | "success" | "failed";
   title: string;

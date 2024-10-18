@@ -21,15 +21,17 @@ const SideBarLink = [
   },
 ];
 
-const ProposalSidebar = ({ id }: { id: string }) => {
+const ProposalSidebar = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // Use useLocation to get current path
 
   const goBack = () => {
-    navigate("/dashboard/projects/" + id);
+    localStorage.removeItem('proposalFormData'); // Clear saved data when exiting
+    navigate("/dashboard/proposals");
   };
 
   const getLinkWithId = (path: string) => {
-    return `/new-proposal/${id}/${path}`;
+    return `/new-proposal/${path}`;
   };
 
   return (
@@ -40,17 +42,16 @@ const ProposalSidebar = ({ id }: { id: string }) => {
             onClick={goBack}
             className="flex justify-start gap-2 rounded-lg text-gray-600 hover:bg-bhasiniBlue hover:text-white bg-transparent items-start px-4 py-2"
           >
-            <MoveLeft className="h-5 w-5" /> <span>Save and Exit</span>
+            <MoveLeft className="h-5 w-5" /> <span>Exit</span>
           </Button>
           {SideBarLink.map((item, index) => (
             <NavLink
               key={index}
               to={getLinkWithId(item.path)}
               className={({ isActive }) =>
-                cn(
-                  "flex items-center gap-2 rounded-lg text-gray-600 hover:text-violet-700 px-4 py-2",
-                  isActive ? " bg-gray-200 text-gray-900" : null
-                )
+                isActive || (location.pathname === `/dashboard/proposals/` && item.path === 'new')
+                  ? "flex items-center gap-2 rounded-lg text-gray-600 hover:text-violet-700 px-4 py-2 bg-gray-200 text-gray-900"
+                  : "flex items-center gap-2 rounded-lg text-gray-600 hover:text-violet-700 px-4 py-2"
               }
             >
               <item.icon className="h-5 w-5" />
@@ -61,7 +62,7 @@ const ProposalSidebar = ({ id }: { id: string }) => {
         <div className="border-b border-gray-300 mt-3"></div>
         <div className="px-4 py-4">
           <Link
-            to="/dashboard/projects/new"
+            to={`/new-proposal/new`}
             className={buttonVariants({
               variant: "default",
               className: "px-6",

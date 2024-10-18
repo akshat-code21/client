@@ -36,6 +36,31 @@ async function getData(): Promise<Proposal[]> {
     console.error('Error fetching proposals:', error);
     return []; 
   }
+  // return [
+  //   {
+  //     id: "728ed52f",
+  //     proposals: "Project 1",
+  //     slugs: "proposal-1",
+  //     status: "pending",
+  //     title: "We need to bypass the neutral TCP sensor!",
+  //   },
+  //   {
+  //     id: "728ed52g",
+  //     proposals: "Project 2",
+  //     slugs: "proposal-2",
+  //     status: "processing",
+  //     title:
+  //       "Use the open-source THX transmitter, then you can hack the auxiliary sensor!",
+  //   },
+  //   {
+  //     id: "728ed52h",
+  //     proposals: "Project 3",
+  //     slugs: "proposal-3",
+  //     status: "success",
+  //     title:
+  //       "Try to quantify the HTTP transmitter, maybe it will bypass the digital firewall!",
+  //   },
+  // ];
 }
 
 

@@ -1,7 +1,7 @@
+import { useEffect } from "react"; // Import useEffect
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,8 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 // Custom validation for file input
-const fileValidation = (value) => {
-  if (!value) return false;
+const fileValidation = (value: File | null) => {
+  if (!value) return false; // No file selected
   const allowedExtensions = [
     "application/pdf",
     "application/msword",
@@ -26,38 +26,90 @@ const fileValidation = (value) => {
 };
 
 const formSchema = z.object({
-  impact: z.string().min(50),
-  resources: z.string().min(50),
-  proposal_details: z.string().min(50),
+  impact: z.string().min(50, "Impact must be at least 50 characters long"),
+  resources: z.string().min(50, "Resources must be at least 50 characters long"),
+  proposal_details: z.string().min(50, "Proposal details must be at least 50 characters long"),
   pdf_file: z.instanceof(File).refine(fileValidation, {
     message: "File must be a PDF or DOC/DOCX",
   }),
 });
 
+// Define the inferred type from the form schema
+type FormValues = z.infer<typeof formSchema>;
+
 function SubmitProposalForm() {
-  const form = useForm({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       impact: "",
       resources: "",
       proposal_details: "",
-      pdf_file: null,
+      pdf_file: undefined,
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const formData = new FormData();
-    for (const key in values) {
-      formData.append(key, values[key]);
+  // Load saved form data from local storage when the component mounts
+  useEffect(() => {
+    const savedData = localStorage.getItem('proposalFormData');
+    if (savedData) {
+      form.reset(JSON.parse(savedData));
     }
+  }, [form]);
 
-    // Handle form submission, e.g., send formData to an API
-    console.log("Form data submitted: ", values);
+  // Function to safely append form values to FormData
+  function appendFormData(formData: FormData, values: FormValues) {
+    Object.entries(values).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
   }
+
+  const onSubmit = (values: FormValues) => {
+    const formData = new FormData();
+    appendFormData(formData, values);
+
+    // Clear saved data on successful submission
+    localStorage.removeItem('proposalFormData');
+
+    const token1 = localStorage.getItem('token');
+    const token2 = localStorage.getItem('refreshToken');
+    const token = token1 ? token1 : token2;
+
+    // Send form data to the backend
+    fetch('http://localhost:3000/proposals', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Success:', data);
+        form.reset(); // Reset the form if needed
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  };
+
+  // Save form data to local storage on any change
+  const saveFormData = (values: FormValues) => {
+    localStorage.setItem('proposalFormData', JSON.stringify(values));
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8"
+        onChange={() => saveFormData(form.getValues())} // Save data on any change
+      >
         <FormField
           control={form.control}
           name="impact"
@@ -110,7 +162,11 @@ function SubmitProposalForm() {
                 <Input
                   type="file"
                   accept=".pdf,.doc,.docx"
-                  onChange={(e) => field.onChange(e.target.files[0])}
+                  onChange={(e) => {
+                    const files = e.target.files;
+                    const file = files ? files[0] : null;
+                    field.onChange(file); // Pass file directly to field
+                  }}
                 />
               </FormControl>
               <FormMessage />

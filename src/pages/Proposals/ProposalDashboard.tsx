@@ -20,7 +20,7 @@ const ProposalDashBoard = () => {
     <main className="max-h-screen max-w-screen">
       <NavBar />
       <div className="flex h-[calc(100vh-65px)] w-full overflow-hidden">
-        <ProposalSidebar id={id as string} />
+        <ProposalSidebar  />
         <div className="h-full w-full flex flex-col p-8 gap-8 overflow-hidden overflow-y-auto">
           <Outlet />
         </div>

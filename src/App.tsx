@@ -72,11 +72,11 @@ const router = createBrowserRouter([
         element: <ProposalsListPage />,
         errorElement: <NotFoundPage />,
       },
-      {
-        path: "proposals/:id",
-        element: <ProposalPage />,
-        errorElement: <NotFoundPage />,
-      },
+      // {
+      //   path: "proposals/:id",
+      //   element: <ProposalPage />,
+      //   errorElement: <NotFoundPage />,
+      // },
       {
         path: "profile",
         element: <Profile />,
@@ -94,15 +94,15 @@ const router = createBrowserRouter([
         element: <NewProposalPage />,
       },
       {
-        path: ":id/new",
+        path: "/new-proposal/new",
         element: <ProposalDetails />,
       },
       {
-        path: ":id/profile",
+        path: "/new-proposal/profile",
         element: <ProposalProfile />,
       },
       {
-        path: ":id/review",
+        path: "/new-proposal/review",
         element: <ProposalReview />,
       },
     ],

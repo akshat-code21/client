@@ -19,8 +19,8 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [buttonText, setButtonText] = useState("Get OTP");
   const [otpGenerated, setOtpGenerated] = useState(false);
-  const [otpPin, setOtpPin] = useState(""); 
-  const [otpExpiryTime, setOtpExpiryTime] = useState<number | null>(null); 
+  const [otpPin, setOtpPin] = useState("");
+  const [otpExpiryTime, setOtpExpiryTime] = useState<number | null>(null);
   const [canResend, setCanResend] = useState(false);
 
   const InvalidEmailError = "Invalid Email ID";
@@ -32,7 +32,7 @@ const LoginPage = () => {
   const contactRef = useRef<HTMLInputElement>(null);
   const otpRef = useRef<HTMLInputElement>(null);
 
-  const otpExpiryDuration = 5 * 60; 
+  const otpExpiryDuration = 5 * 60; // OTP expiry time in seconds
   useEffect(() => {
     if (otpExpiryTime && otpExpiryTime > 0) {
       const timer = setInterval(() => {
@@ -64,12 +64,20 @@ const LoginPage = () => {
       if (!response.ok) {
         throw new Error("Failed to refresh token");
       }
-
+      console.log("refreshed token called")
       const data = await response.json();
-      localStorage.setItem("token", data.token); 
+      localStorage.setItem("token", data.token);
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const isTokenExpired = () => {
+    const token = localStorage.getItem("token");
+    if (!token) return true; // Token doesn't exist
+    const tokenData = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+    return tokenData.exp < currentTime; // Check if token is expired
   };
 
   async function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
@@ -101,9 +109,9 @@ const LoginPage = () => {
         setOtpPin(data.otp_pin);
         setButtonText("Verify OTP");
         setOtpGenerated(true);
-        setOtpExpiryTime(otpExpiryDuration); 
+        setOtpExpiryTime(otpExpiryDuration);
         setError("");
-        setCanResend(false); 
+        setCanResend(false);
       } catch (err) {
         setError("Failed to generate OTP.");
         console.error(err);
@@ -115,6 +123,11 @@ const LoginPage = () => {
       const otp = otpRef.current?.value || "";
 
       try {
+        // Check if token is expired and refresh if needed
+        if (isTokenExpired()) {
+          await refreshToken();
+        }
+
         const response = await fetch("http://localhost:3000/auth/signin", {
           method: "POST",
           headers: {
@@ -136,7 +149,7 @@ const LoginPage = () => {
         });
 
         localStorage.setItem("token", loginData.token);
-        localStorage.setItem("refreshToken", loginData.refreshToken); 
+        localStorage.setItem("refreshToken", loginData.refreshToken);
 
         setError("");
         navigate("/dashboard");
@@ -156,7 +169,7 @@ const LoginPage = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:3000/auth/resendOTP", {
+      const response = await fetch("http://localhost:3000/auth/sendOTP", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -170,8 +183,8 @@ const LoginPage = () => {
 
       const data = await response.json();
       setOtpPin(data.otp_pin);
-      setOtpExpiryTime(otpExpiryDuration); 
-      setCanResend(false); 
+      setOtpExpiryTime(otpExpiryDuration);
+      setCanResend(false);
     } catch (err) {
       setError("Failed to resend OTP.");
       console.error(err);
@@ -246,6 +259,7 @@ const LoginPage = () => {
           </Button>
         )}
       </Card>
+      <CardFooter></CardFooter>
     </>
   );
 };

@@ -43,15 +43,16 @@ function ProposalPage() {
             <p>Proposal ID: {id}</p>
           </div>
           {user?.type !== "admin" ? (
-            <Link
-              to={`/new-proposal/${id}/new`}
-              className={buttonVariants({
-                variant: "default",
-                className: "bg-bhasiniBlue",
-              })}
-            >
-              Start Contribution
-            </Link>
+            // <Link
+            //   to={`/new-proposal/${id}/new`}
+            //   className={buttonVariants({
+            //     variant: "default",
+            //     className: "bg-bhasiniBlue",
+            //   })}
+            // >
+            //   Start Contribution
+            // </Link>
+            <></>
           ) : (
             <>
               <div className="flex gap-4 items-center">

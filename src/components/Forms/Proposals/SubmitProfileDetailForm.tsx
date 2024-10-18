@@ -164,7 +164,11 @@ function SubmitProfileDetailForm() {
                     <Input
                       type="file"
                       accept=".pdf,.doc,.docx"
-                      onChange={(e) => field.onChange(e.target.files[0])}
+                      onChange={(e) => {
+                        const files = e.target.files; // Store files in a variable
+                        const file = files ? files[0] : null; // Check if files is not null
+                        field.onChange(file);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -181,7 +185,13 @@ function SubmitProfileDetailForm() {
                     <Input
                       type="file"
                       accept=".pdf,.doc,.docx"
-                      onChange={(e) => field.onChange(e.target.files[0])}
+                      onChange={(e) => {
+                        {
+                          const files = e.target.files; // Store files in a variable
+                          const file = files ? files[0] : null; // Check if files is not null
+                          field.onChange(file);
+                        }
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -325,10 +335,16 @@ function SubmitProfileDetailForm() {
                 <FormItem>
                   <FormLabel>No Objection Certificate</FormLabel>
                   <FormControl>
-                    <Input
+                  <Input
                       type="file"
                       accept=".pdf,.doc,.docx"
-                      onChange={(e) => field.onChange(e.target.files[0])}
+                      onChange={(e) => {
+                        {
+                          const files = e.target.files; // Store files in a variable
+                          const file = files ? files[0] : null; // Check if files is not null
+                          field.onChange(file);
+                        }
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -342,10 +358,16 @@ function SubmitProfileDetailForm() {
                 <FormItem>
                   <FormLabel>Enrollment Certificate</FormLabel>
                   <FormControl>
-                    <Input
+                  <Input
                       type="file"
                       accept=".pdf,.doc,.docx"
-                      onChange={(e) => field.onChange(e.target.files[0])}
+                      onChange={(e) => {
+                        {
+                          const files = e.target.files; // Store files in a variable
+                          const file = files ? files[0] : null; // Check if files is not null
+                          field.onChange(file);
+                        }
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
