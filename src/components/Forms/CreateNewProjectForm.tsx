@@ -145,8 +145,12 @@ export function CreateNewProjectForm() {
             />
           </div>
           <div className="flex gap-4 justify-end px-4 py-4">
-            <Button className="bg-red-500">Cancel</Button>
-            <Button type="submit" className="bg-bhasiniBlue">Submit</Button>
+            <Button type="button" className="bg-red-500" onClick={() => navigate('/dashboard/projects')}>
+               Cancel
+            </Button>
+            <Button type="submit" className="bg-bhasiniBlue">
+               Submit
+            </Button>
           </div>
         </form>
       </Form>
