@@ -47,38 +47,83 @@ export function CreateNewProjectForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      const projectType = "NEW"; 
-  
-      const token = localStorage.getItem('token'); 
-  
-      const response = await fetch('http://localhost:3000/projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, 
-        },
-        body: JSON.stringify({
-          name: values.projectTitle,
-          description: values.projectDescription,
-          type: projectType, 
-        }),
-      });
-  
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Project created:', data);
-        
-        // Redirect to the projects page after successful submission
-        navigate('/dashboard/projects'); // Use navigate to go to the projects page
-      } else {
-        const errorData = await response.json(); 
-        console.error('Failed to create project:', errorData);
-      }
-    } catch (error) {
-      console.error('Error creating project:', error);
+  try {
+    let token = localStorage.getItem('token');
+    const refreshToken = localStorage.getItem('refreshToken');
+
+    if (!token || !refreshToken) {
+      throw new Error('Token or refresh token is missing');
     }
+
+    // Check if the token is expired
+    const isExpired = isTokenExpired(token);
+    if (isExpired) {
+      // If expired, refresh the token
+      token = await refreshTokenFunction(refreshToken);
+    }
+
+    // Make the API request with the valid token
+    const projectType = "NEW"; 
+    const response = await fetch('http://localhost:3000/projects', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        name: values.projectTitle,
+        description: values.projectDescription,
+        type: projectType, 
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Project created:', data);
+      // Redirect to the projects page after successful submission
+      navigate('/dashboard/projects');
+    } else {
+      const errorData = await response.json();
+      console.error('Failed to create project:', errorData);
+    }
+  } catch (error) {
+    console.error('Error creating project:', error);
   }
+}
+
+// Function to check if the token is expired
+const isTokenExpired = (token: string): boolean => {
+  const tokenData = JSON.parse(atob(token.split('.')[1]));
+  const currentTime = Math.floor(Date.now() / 1000);
+  return tokenData.exp < currentTime;
+};
+
+// Function to refresh the token
+async function refreshTokenFunction(refreshToken: string): Promise<string> {
+  try {
+    const response = await fetch('http://localhost:3000/auth/refreshToken', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(`Failed to refresh token: ${errorMessage}`);
+    }
+
+    const data = await response.json();
+    const newToken = data.token;
+    localStorage.setItem('token', newToken); // Store the new token
+    return newToken;
+  } catch (err) {
+    console.error('Error refreshing token:', err);
+    throw new Error('Failed to refresh token');
+  }
+}
+
   
 
   return (

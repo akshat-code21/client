@@ -3,7 +3,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -49,6 +48,7 @@ const LoginPage = () => {
     const refreshToken = localStorage.getItem("refreshToken");
 
     if (!refreshToken) {
+      console.log("No refresh token found");
       return;
     }
 
@@ -62,13 +62,16 @@ const LoginPage = () => {
       });
 
       if (!response.ok) {
+        const responseText = await response.text();
+        console.log("Error refreshing token:", responseText);
         throw new Error("Failed to refresh token");
       }
-      console.log("refreshed token called")
+
       const data = await response.json();
       localStorage.setItem("token", data.token);
+      console.log("Token refreshed successfully");
     } catch (err) {
-      console.error(err);
+      console.error("Error refreshing token:", err);
     }
   };
 
@@ -77,6 +80,7 @@ const LoginPage = () => {
     if (!token) return true; // Token doesn't exist
     const tokenData = JSON.parse(atob(token.split('.')[1]));
     const currentTime = Math.floor(Date.now() / 1000);
+    console.log("Token Expiry:", tokenData.exp, "Current Time:", currentTime);
     return tokenData.exp < currentTime; // Check if token is expired
   };
 
@@ -244,7 +248,7 @@ const LoginPage = () => {
         <Button
           disabled={loading}
           onClick={handleSubmit}
-          className="bg-bhasiniBlue hover:bg-bhashiniBlueHover w-full"
+          className="bg-bhasiniBlue hover:bg-bhasiniBlueHover w-full"
         >
           {buttonText}
         </Button>
@@ -259,7 +263,6 @@ const LoginPage = () => {
           </Button>
         )}
       </Card>
-      <CardFooter></CardFooter>
     </>
   );
 };

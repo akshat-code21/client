@@ -1,54 +1,133 @@
 import { Project, columns } from "../components/Table/columns";
 import { DataTable } from "../components/Table/data-table";
-
 import { useEffect, useState } from "react";
 
-async function getData(): Promise<Project[]> { 
-  try {
-    const token = localStorage.getItem('token'); 
+let isRefreshing = false; // Flag to track if a refresh is in progress
+let refreshTokenPromise: Promise<string> | null = null; // Store the ongoing refresh promise
 
+// Function to check if the token is expired
+const isTokenExpired = (token: string): boolean => {
+  const tokenData = JSON.parse(atob(token.split('.')[1]));
+  const currentTime = Math.floor(Date.now() / 1000);
+  return tokenData.exp < currentTime;
+};
+
+// Function to refresh the token
+async function refreshTokenFunction(refreshToken: string): Promise<string> {
+  if (isRefreshing) {
+    if (refreshTokenPromise) {
+      return refreshTokenPromise;
+    }
+  }
+
+  isRefreshing = true; // Set the flag to true while refresh is in progress
+  refreshTokenPromise = new Promise(async (resolve, reject) => {
+    try {
+      const response = await fetch('http://localhost:3000/auth/refreshToken', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(`Failed to refresh token: ${errorMessage}`);
+      }
+
+      const data = await response.json();
+      const newToken = data.token;
+      localStorage.setItem('token', newToken); // Store the new token
+      resolve(newToken);
+    } catch (err) {
+      reject(err);
+    } finally {
+      isRefreshing = false; // Reset the flag when refresh is done
+      refreshTokenPromise = null; // Clear the ongoing promise
+    }
+  });
+
+  return refreshTokenPromise;
+}
+
+async function getData(): Promise<Project[]> {
+  try {
+    let token = localStorage.getItem('token');
+    const refreshToken = localStorage.getItem('refreshToken');
+
+    if (!token || !refreshToken) {
+      throw new Error('Token or refresh token is missing');
+    }
+
+    // Check if the token is expired
+    const isExpired = isTokenExpired(token);
+    if (isExpired) {
+      // If expired, refresh the token
+      token = await refreshTokenFunction(refreshToken);
+    }
+
+    // Make the API request with the valid token
     const response = await fetch('http://localhost:3000/projects', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`, 
+        Authorization: `Bearer ${token}`,
       },
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch projects'); 
+      const errorMessage = await response.text();
+      throw new Error(`Failed to fetch projects: ${errorMessage}`);
     }
 
     const data = await response.json();
-    console.log(data.data); 
+    console.log(data.data);
 
-    
     const projects: Project[] = data.data.map((item: any) => ({
-      id: item.id, 
-      projects: `Project ${item.id}`, 
-      slugs: `${item.id}` || "", 
-      status: "pending", 
-      title: item.name || "", 
+      id: item.id,
+      projects: `Project ${item.id}`,
+      slugs: `${item.id}` || "",
+      status: "pending", // You can adjust the logic for status here
+      title: item.name || "",
     }));
 
-    return projects; 
+    return projects;
   } catch (error) {
     console.error('Error fetching projects:', error);
-    return []; 
+    return [];
   }
 }
 
 
+
 export default function DemoPage() {
   const [data, setData] = useState<Project[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getData();
-      setData(data);
+      try {
+        setLoading(true);
+        setError(null); // Reset error before fetch
+        const projects = await getData();
+        setData(projects);
+      } catch (err) {
+        setError('Error fetching projects. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchData();
   }, []);
 
-  return <DataTable columns={columns} data={data} />;
+  return (
+    <div>
+      {loading && <p>Loading projects...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <DataTable columns={columns} data={data} />
+    </div>
+  );
 }
