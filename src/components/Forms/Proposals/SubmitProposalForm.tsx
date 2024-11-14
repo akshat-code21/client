@@ -1,4 +1,4 @@
-import { useEffect } from "react"; // Import useEffect
+import { useEffect } from "react"; 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useNavigate } from "react-router-dom"; // Import useNavigate from React Router
 
 // Custom validation for file input
 const fileValidation = (value: File | null) => {
@@ -47,6 +48,8 @@ function SubmitProposalForm() {
       pdf_file: undefined,
     },
   });
+
+  const navigate = useNavigate(); // Initialize useNavigate
 
   // Load saved form data from local storage when the component mounts
   useEffect(() => {
@@ -92,6 +95,7 @@ function SubmitProposalForm() {
       .then(data => {
         console.log('Success:', data);
         form.reset(); // Reset the form if needed
+        navigate("/new-proposal/profile"); // Redirect the user to the next page
       })
       .catch(error => {
         console.error('Error:', error);
@@ -151,8 +155,10 @@ function SubmitProposalForm() {
             </FormItem>
           )}
         />
-
-        <FormField
+        <div>
+          Placeholder to collect file here
+        </div>
+        {/* <FormField
           control={form.control}
           name="pdf_file"
           render={({ field }) => (
@@ -172,9 +178,9 @@ function SubmitProposalForm() {
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
 
-        <Button type="submit">Submit</Button>
+        <Button onClick={()=>{navigate('/new-proposal/profile')}}>Save and Next</Button>
       </form>
     </Form>
   );
