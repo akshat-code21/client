@@ -10,6 +10,7 @@ import ProjectListPage from "./pages/Projects/ProjectsListPage";
 import Profile from "./pages/Profile";
 import NewProjectPage from "./pages/Projects/NewProjectPage";
 import LoginPage from "./pages/Auth/LoginPage";
+import AdminLoginPage from "./pages/Auth/AdminLoginPage"
 import SignupPage from "./pages/Auth/SignupPage";
 import AuthLayout from "./pages/Auth/AuthLayout";
 import OverviewPage from "./pages/OverviewPage";
@@ -20,6 +21,7 @@ import ProposalReview from "./pages/Proposals/NewProposal/ProposalReview";
 import NewProposalPage from "./pages/Proposals/NewProposal/NewProposalPage";
 import { Toaster } from "./components/ui/toaster";
 import ProjectPageWithoutDashboard from "./pages/Projects/ProjectPageWithoutDashboard";
+import AdminSignupPage from "./pages/Auth/AdminSignupPage";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +44,20 @@ const router = createBrowserRouter([
     ],
   },
   {
+    path : "/auth/admin",
+    element : <AuthLayout/>,
+    children: [
+      {
+        path: "login",
+        element: <AdminLoginPage />,
+      },
+      {
+        path: "signup",
+        element: <AdminSignupPage />,
+      },
+    ],
+  },
+  {
     path: "projects",
     element: <ProjectPageWithoutDashboard />,
     children: [
@@ -49,7 +65,18 @@ const router = createBrowserRouter([
       { path: "all", element: <ProjectListPage /> },
     ],
   },
-
+  {
+    path:"admin/dashboard",
+    element : <DashBoard />,
+    children : [
+      {path : "projects",element : <ProjectListPage />},
+      {path : "projects/new",element : <NewProjectPage/>},
+      {path : "proposals/all",element : <></>},
+      {path : "projects/:id",element : <></>},
+      {path : "proposals/:id",element : <></>},
+      {path : "overview",element : <OverviewPage /> }
+    ]
+  },
   {
     path: "dashboard",
     element: <DashBoard />,

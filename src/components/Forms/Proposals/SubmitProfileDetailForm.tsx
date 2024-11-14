@@ -2,6 +2,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import {
   Form,
   FormControl,
@@ -94,10 +95,11 @@ function SubmitProfileDetailForm() {
     // Handle form submission, e.g., send formData to an API
     console.log("Form data submitted: ", values);
   }
-
+  const navigate = useNavigate();
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      {/* <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8"> */}
+      <form  className="space-y-8">
         {/* Personal Information */}
         <div className="space-y-4">
           <SectionHeading title="Personal Information" />
@@ -377,7 +379,7 @@ function SubmitProfileDetailForm() {
           </div>
         </div>
 
-        <Button type="submit">Submit</Button>
+        <Button onClick={()=>{navigate('/new-proposal/review')}}>Save and Next</Button>
       </form>
     </Form>
   );

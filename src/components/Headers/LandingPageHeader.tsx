@@ -35,6 +35,10 @@ const navLinks: NavLinkProps[] = [
     to: "/",
     text: "Contributor Portal",
   },
+  {
+    to : "/auth/admin/signup",
+    text : "Admin Signup"
+  }
 ];
 
 function LandingPageHeader() {
@@ -59,7 +63,7 @@ function LandingPageHeader() {
       <div className="lg:flex hidden gap-8 h-[55px] items-center px-4 lg:px-[60px] bg-[#F3F3F3]">
         {navLinks.map((navLink) => (
           <>
-            <NavLink to={navLink.to} className="text-[#3A3A3A]">
+            <NavLink to={navLink.to} key={navLink.to} className="text-[#3A3A3A]">
               {navLink.text}
             </NavLink>
           </>

@@ -10,7 +10,12 @@ const AuthLayout = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/dashboard");
+      if(user.type==="admin")
+      {
+        navigate('/admin/dashboard');
+      }
+      else  
+        navigate('/dashboard/overview')
     }
   }, [user, navigate]);
 
