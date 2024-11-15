@@ -16,7 +16,7 @@ const ProjectListPage = () => {
         description="Choose the Project you are Interested in!"
       >
         {user?.type === "admin" && (
-          <Link to="" className={buttonVariants({ variant: "default" })}>
+          <Link to="/admin/dashboard/projects/new" className={buttonVariants({ variant: "default" })}>
             Create a new Project
           </Link>
         )}

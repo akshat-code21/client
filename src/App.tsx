@@ -71,10 +71,11 @@ const router = createBrowserRouter([
     children : [
       {path : "projects",element : <ProjectListPage />},
       {path : "projects/new",element : <NewProjectPage/>},
-      {path : "proposals/all",element : <></>},
+      {path : "proposals",element : <ProposalsListPage/>},
       {path : "projects/:id",element : <></>},
       {path : "proposals/:id",element : <></>},
-      {path : "overview",element : <OverviewPage /> }
+      {path : "overview",element : <OverviewPage /> },
+      {path : "profile",element : <Profile></Profile>}
     ]
   },
   {
