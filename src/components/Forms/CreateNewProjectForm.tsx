@@ -190,7 +190,7 @@ async function refreshTokenFunction(refreshToken: string): Promise<string> {
             />
           </div>
           <div className="flex gap-4 justify-end px-4 py-4">
-            <Button type="button" className="bg-red-500" onClick={() => navigate('/dashboard/projects')}>
+            <Button type="button" className="bg-red-500" onClick={() => navigate('/admin/dashboard/projects')}>
                Cancel
             </Button>
             <Button type="submit" className="bg-bhasiniBlue">

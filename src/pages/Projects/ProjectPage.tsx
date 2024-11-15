@@ -89,7 +89,15 @@ function ProjectPage() {
           </div>
         </div>
           <div>
-              <Link
+              {user?.type==="admin" ? <Link
+              to={`/admin/dashboard/projects`}
+              className={buttonVariants({
+                // variant: "default",
+                className: "bg-bhasiniBlue",
+              })}
+              >
+              Go Back
+            </Link>:<Link
               to={`/dashboard/projects`}
               className={buttonVariants({
                 // variant: "default",
@@ -97,7 +105,7 @@ function ProjectPage() {
               })}
               >
               Go Back
-            </Link>
+            </Link>}
           </div>
       </main>
     </>

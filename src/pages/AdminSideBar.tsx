@@ -49,7 +49,7 @@ const AdminSideBar = () => {
           ))}
         </div>
         <div className="border-b border-gray-300 mt-3"></div>
-        <div className="px-4 py-4">
+        {/* <div className="px-4 py-4">
           <Link
             to={"/new-proposal/new"}
             className={buttonVariants({
@@ -59,7 +59,7 @@ const AdminSideBar = () => {
           >
             Submit a new Proposal
           </Link>
-        </div>
+        </div> */}
       </div>
       <div className="border-r border-gray-200"></div>
     </div>

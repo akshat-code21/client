@@ -72,7 +72,7 @@ const router = createBrowserRouter([
       {path : "projects",element : <ProjectListPage />},
       {path : "projects/new",element : <NewProjectPage/>},
       {path : "proposals",element : <ProposalsListPage/>},
-      {path : "projects/:id",element : <></>},
+      {path : "projects/:id",element : <ProjectPage/>},
       {path : "proposals/:id",element : <></>},
       {path : "overview",element : <OverviewPage /> },
       {path : "profile",element : <Profile></Profile>}
@@ -122,7 +122,7 @@ const router = createBrowserRouter([
         element: <NewProposalPage />,
       },
       {
-        path: "/new-proposal/new",
+        path: "/new-proposal/:id/new",
         element: <ProposalDetails />,
       },
       {
