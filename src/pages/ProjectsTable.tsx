@@ -50,7 +50,40 @@ async function refreshTokenFunction(refreshToken: string): Promise<string> {
 
   return refreshTokenPromise;
 }
+async function getAdminData():Promise<Project[]>{
+  try {
+    const token = localStorage.getItem('token'); 
 
+    const response = await fetch('http://localhost:3000/admin/projects', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, 
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch projects'); 
+    }
+
+    const data = await response.json();
+    console.log(data.data); 
+
+    
+    const projects: Project[] = data.data.map((item: any) => ({
+      id: item.id, 
+      projects: `Project ${item.id}`, 
+      slugs: `${item.id}` || "", 
+      status: "pending", 
+      title: item.name || "", 
+    }));
+
+    return projects; 
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+    return []; 
+  }
+}
 async function getData(): Promise<Project[]> {
   try {
     let token = localStorage.getItem('token');
@@ -98,26 +131,40 @@ async function getData(): Promise<Project[]> {
     return [];
   }
 }
-async function getAdminData():Promise<Project[]>{
-  try {
-    const token = localStorage.getItem('token'); 
+// async function getData(): Promise<Project[]> { 
+//   try {
+//     const token = localStorage.getItem('token'); 
 
-    const response = await fetch('http://localhost:3000/admin/projects', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`, 
-      },
-    });
+//     const response = await fetch('http://localhost:3000/projects', {
+//       method: 'GET',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': `Bearer ${token}`, 
+//       },
+//     });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch projects'); 
-    }
+//     if (!response.ok) {
+//       throw new Error('Failed to fetch projects'); 
+//     }
 
-    const data = await response.json();
-    console.log(data.data); 
+//     const data = await response.json();
+//     console.log(data.data); 
 
+    
+//     const projects: Project[] = data.data.map((item: any) => ({
+//       id: item.id, 
+//       projects: `Project ${item.id}`, 
+//       slugs: `${item.id}` || "", 
+//       status: "pending", 
+//       title: item.name || "", 
+//     }));
 
+//     return projects; 
+//   } catch (error) {
+//     console.error('Error fetching projects:', error);
+//     return []; 
+//   }
+// }
 
 // export default function DemoPage() {
 // =======
@@ -150,7 +197,7 @@ export function DemoPage() {
   }, []);
 
   return <DataTable columns={columns} data={data} />;
-  );
+  // );
 }
 export function AdminDemoPage(){
   const [data, setData] = useState<Project[]>([]);
