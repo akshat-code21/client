@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "../ui/button";
+import { useBhasiniStore } from "@/store/store";
 
 const formSchema = z.object({
   projectTitle: z.string().min(5, {
@@ -36,6 +37,7 @@ const formSchema = z.object({
 });
 
 export function CreateNewProjectForm() {
+  const { user } = useBhasiniStore();
   const navigate = useNavigate(); // Initialize useNavigate
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,7 +50,18 @@ export function CreateNewProjectForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
   try {
-    let token = localStorage.getItem('token');
+    
+    // let adminToken = localStorage.getItem('adminToken');
+    let token;
+    {
+      if (user?.type === "admin")
+      {
+        token = localStorage.getItem('adminToken');
+      } else {
+        token = localStorage.getItem('token');
+      }
+    }
+
     const refreshToken = localStorage.getItem('refreshToken');
 
     if (!token || !refreshToken) {
