@@ -118,7 +118,7 @@ const router = createBrowserRouter([
     errorElement: <NotFoundPage />,
     children: [
       {
-        path: "",
+        path: "/new-proposal/new",
         element: <NewProposalPage />,
       },
       {

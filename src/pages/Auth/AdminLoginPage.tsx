@@ -88,7 +88,7 @@ const AdminLoginPage = () => {
         return;
       }
       try {
-        const response = await fetch("http://localhost:3000/auth/sendOTP", {
+        const response = await fetch("http://localhost:3000/auth/sendOTP/admin", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email }),
@@ -116,7 +116,7 @@ const AdminLoginPage = () => {
       const otp = otpRef.current?.value || "";
 
       try {
-        const response = await fetch("http://localhost:3000/auth/signin", {
+        const response = await fetch("http://localhost:3000/auth/signin/admin", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, otp }),
@@ -155,7 +155,7 @@ const AdminLoginPage = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:3000/auth/sendOTP", {
+      const response = await fetch("http://localhost:3000/auth/sendOTP/admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

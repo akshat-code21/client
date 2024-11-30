@@ -48,7 +48,7 @@ export function CreateNewProjectForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
   try {
-    let token = localStorage.getItem('token');
+    let token = localStorage.getItem('adminToken');
     const refreshToken = localStorage.getItem('refreshToken');
 
     if (!token || !refreshToken) {
@@ -64,7 +64,7 @@ export function CreateNewProjectForm() {
 
     // Make the API request with the valid token
     const projectType = "NEW"; 
-    const response = await fetch('http://localhost:3000/projects', {
+    const response = await fetch('http://localhost:3000/admin/project', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ export function CreateNewProjectForm() {
       const data = await response.json();
       console.log('Project created:', data);
       // Redirect to the projects page after successful submission
-      navigate('/dashboard/projects');
+      navigate('/admin/dashboard/projects');
     } else {
       const errorData = await response.json();
       console.error('Failed to create project:', errorData);

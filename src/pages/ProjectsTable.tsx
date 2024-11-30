@@ -13,7 +13,7 @@ const isTokenExpired = (token: string): boolean => {
 };
 
 // Function to refresh the token
-async function refreshTokenFunction(refreshToken: string): Promise<string> {
+async function refreshUserTokenFunction(refreshToken: string): Promise<string> {
   if (isRefreshing) {
     if (refreshTokenPromise) {
       return refreshTokenPromise;
@@ -38,7 +38,46 @@ async function refreshTokenFunction(refreshToken: string): Promise<string> {
 
       const data = await response.json();
       const newToken = data.token;
+      
       localStorage.setItem('token', newToken); // Store the new token
+      resolve(newToken);
+    } catch (err) {
+      reject(err);
+    } finally {
+      isRefreshing = false; // Reset the flag when refresh is done
+      refreshTokenPromise = null; // Clear the ongoing promise
+    }
+  });
+
+  return refreshTokenPromise;
+}
+async function refreshAdminTokenFunction(refreshToken: string): Promise<string> {
+  if (isRefreshing) {
+    if (refreshTokenPromise) {
+      return refreshTokenPromise;
+    }
+  }
+
+  isRefreshing = true; // Set the flag to true while refresh is in progress
+  refreshTokenPromise = new Promise(async (resolve, reject) => {
+    try {
+      const response = await fetch('http://localhost:3000/auth/refreshToken', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(`Failed to refresh token: ${errorMessage}`);
+      }
+
+      const data = await response.json();
+      const newToken = data.token;
+      
+      localStorage.setItem('adminToken', newToken); // Store the new token
       resolve(newToken);
     } catch (err) {
       reject(err);
@@ -52,8 +91,19 @@ async function refreshTokenFunction(refreshToken: string): Promise<string> {
 }
 async function getAdminData():Promise<Project[]>{
   try {
-    const token = localStorage.getItem('token'); 
+    let token = localStorage.getItem('adminToken'); 
+    const refreshToken = localStorage.getItem('refreshToken');
 
+    if (!token || !refreshToken) {
+      throw new Error('Token or refresh token is missing');
+    }
+
+    // Check if the token is expired
+    const isExpired = isTokenExpired(token);
+    if (isExpired) {
+      // If expired, refresh the token
+      token = await refreshAdminTokenFunction(refreshToken);
+    }
     const response = await fetch('http://localhost:3000/admin/projects', {
       method: 'GET',
       headers: {
@@ -97,7 +147,7 @@ async function getData(): Promise<Project[]> {
     const isExpired = isTokenExpired(token);
     if (isExpired) {
       // If expired, refresh the token
-      token = await refreshTokenFunction(refreshToken);
+      token = await refreshUserTokenFunction(refreshToken);
     }
 
     // Make the API request with the valid token
@@ -187,7 +237,11 @@ async function getData(): Promise<Project[]> {
 export function DemoPage() {
 
   const [data, setData] = useState<Project[]>([]);
-
+  // let token = localStorage.getItem('token');
+  // let refreshToken = localStorage.getItem('refreshToken');
+  // if (isTokenExpired(token)) {
+  //   refreshTokenFunction(refreshToken);
+  // }
   useEffect(() => {
     const fetchData = async () => {
       const data = await getData();
@@ -210,4 +264,3 @@ export function AdminDemoPage(){
   }, []);
   return <DataTable columns={columns} data={data} />;
 }
-

@@ -62,7 +62,7 @@ const ProposalSidebar = () => {
         <div className="border-b border-gray-300 mt-3"></div>
         <div className="px-4 py-4">
           <Link
-            to={`/new-proposal/new`}
+            to={`/new-proposal/new/`}
             className={buttonVariants({
               variant: "default",
               className: "px-6",
